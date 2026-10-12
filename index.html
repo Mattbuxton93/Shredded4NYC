@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Discipline">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#07110c">
+<title>Discipline</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg:#07110c;
+  --surface:#0e1b14;
+  --surface2:#13261b;
+  --line:#1f3a2a;
+  --green:#3ddc84;
+  --green-deep:#14532d;
+  --green-dim:#0f2e1f;
+  --gold:#e6c65a;
+  --gold-dim:#2b2610;
+  --text:#e8f3ec;
+  --text-dim:#8aa395;
+  --text-faint:#4d6657;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+body{
+  background:
+    radial-gradient(ellipse at 100% 0%, #0f3a22 0%, transparent 45%),
+    radial-gradient(ellipse at 0% 100%, #0b2a19 0%, transparent 40%),
+    var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  min-height:100vh;
+  padding-bottom:70px;
+}
+.wrap{max-width:640px; margin:0 auto; padding:22px 16px 0;}
+
+.brand{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+.brand-name{font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:3px; color:var(--text);}
+.brand-name span{color:var(--green);}
+.brand-dot{width:10px; height:10px; border-radius:50%; background:var(--green); box-shadow:0 0 0 4px var(--green-dim);}
+
+.tabs{display:flex; gap:8px; margin-bottom:20px;}
+.tab-btn{flex:1; border:1px solid var(--line); background:var(--surface); color:var(--text-dim); font-family:'DM Sans',sans-serif; font-weight:600; font-size:14px; padding:12px 0; border-radius:999px; cursor:pointer;}
+.tab-btn.active{background:var(--green); border-color:var(--green); color:#04140a;}
+
+.view{display:none;}
+.view.active{display:block;}
+
+.hero{background:linear-gradient(145deg, var(--green-dim), var(--surface) 75%); border:1px solid var(--line); border-radius:20px; padding:22px 20px 20px; margin-bottom:22px;}
+.hero-top{display:flex; align-items:baseline; justify-content:space-between; gap:10px;}
+.hero-day{font-family:'Bebas Neue',sans-serif; font-size:56px; line-height:1; letter-spacing:2px; color:var(--green);}
+.hero-count{font-size:12.5px; color:var(--text-dim); font-weight:500;}
+.hero-quote{margin-top:14px; font-size:17px; line-height:1.5; font-weight:500; color:var(--text);}
+.hero-by{margin-top:8px; font-size:12.5px; color:var(--text-dim); letter-spacing:.5px;}
+
+.section-label{font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--text-faint); margin-bottom:10px;}
+.section-label.rest-label{margin-top:2px;}
+
+.day-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(44px,1fr)); gap:8px; margin-bottom:22px;}
+.day-cell{
+  position:relative; aspect-ratio:1/1; background:var(--surface); border:1px solid var(--line);
+  border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:border-color .15s, background .15s;
+}
+.day-cell:hover{border-color:var(--green-deep);}
+.day-cell.current{border-color:var(--text-dim);}
+.day-cell.selected{border-color:var(--green); box-shadow:0 0 0 2px var(--green-dim), 0 0 0 3px var(--green);}
+.day-cell.partial{background:var(--green-dim);}
+.day-cell.complete{background:var(--green); border-color:var(--green);}
+.day-cell.complete .day-num{color:#04140a;}
+.day-cell.finish{border-color:var(--gold); background:var(--gold-dim);}
+.day-cell.finish.complete{background:var(--gold);}
+.day-cell.finish.selected{box-shadow:0 0 0 2px var(--gold-dim), 0 0 0 3px var(--gold);}
+.day-cell.rest{opacity:0.2; cursor:default; border-style:dashed; background:transparent;}
+.day-cell.rest:hover{border-color:var(--line);}
+.day-num{font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:.5px; color:var(--text);}
+.day-cell.rest .day-num{color:var(--text-faint);}
+.badge{position:absolute; top:-7px; right:-7px; width:20px; height:20px; border-radius:50%; background:var(--gold); display:flex; align-items:center; justify-content:center; font-size:11px; border:2px solid var(--bg);}
+.badge.esb{width:24px; height:24px; top:-9px; right:-9px;}
+
+.day-detail{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:6px 18px 10px;}
+.weight-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 0; border-bottom:1px solid var(--line);}
+.weight-row label{font-size:15px; font-weight:600;}
+.weight-input-wrap{display:flex; align-items:center; gap:6px;}
+.weight-input-wrap input{width:84px; background:var(--surface2); border:1px solid var(--line); color:var(--text); border-radius:10px; padding:9px; font-size:15px; text-align:right; font-family:inherit;}
+.weight-input-wrap input:focus{outline:none; border-color:var(--green);}
+.weight-input-wrap span{font-size:13px; color:var(--text-faint);}
+.check-row{display:flex; align-items:center; gap:14px; padding:14px 0; border-bottom:1px solid var(--line); cursor:pointer; user-select:none;}
+.check-row:last-child{border-bottom:none;}
+.check-box{width:24px; height:24px; border-radius:50%; border:2px solid var(--text-faint); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#04140a; transition:background .1s, border-color .1s;}
+.check-row.checked .check-box{background:var(--green); border-color:var(--green);}
+.check-label{font-size:15px; font-weight:500;}
+.check-row.checked .check-label{color:var(--text-dim);}
+
+.day-picker{display:flex; gap:8px; margin-bottom:20px;}
+.day-pick-btn{flex:1; background:var(--surface); border:1px solid var(--line); color:var(--text-dim); border-radius:14px; padding:14px 10px; cursor:pointer; text-align:center; font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px;}
+.day-pick-btn.active{border-color:var(--green); background:var(--green-dim); color:var(--green);}
+
+.session-head{margin-bottom:14px;}
+.session-head .title{font-family:'Bebas Neue',sans-serif; font-size:34px; letter-spacing:2px; color:var(--text);}
+
+.ex-card{background:var(--surface); border:1px solid var(--line); border-radius:14px; margin-bottom:10px; overflow:hidden;}
+.ex-head{padding:14px 16px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+.ex-name{font-weight:600; font-size:15px;}
+.ex-target{font-size:12.5px; color:var(--text-faint); margin-top:2px;}
+.ex-last{font-size:12.5px; color:var(--green); margin-top:5px;}
+.ex-head-right{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+.icon-btn{background:transparent; border:none; color:var(--text-faint); cursor:pointer; padding:4px; font-size:16px; line-height:1;}
+.icon-btn:hover{color:var(--green);}
+.ex-chevron{color:var(--text-faint); transition:transform .15s;}
+.ex-card.open .ex-chevron{transform:rotate(180deg);}
+.ex-body{display:none; padding:0 16px 16px;}
+.ex-card.open .ex-body{display:block;}
+.set-row{display:grid; grid-template-columns:28px 1fr 1fr; gap:8px; align-items:center; margin-bottom:8px;}
+.set-row .set-num{font-size:12.5px; color:var(--text-faint); font-weight:700;}
+.set-row input{background:var(--surface2); border:1px solid var(--line); color:var(--text); border-radius:10px; padding:10px; font-size:15px; width:100%; font-family:inherit;}
+.set-row input:focus{outline:none; border-color:var(--green);}
+.ex-actions{display:flex; gap:8px; margin-top:12px;}
+.btn-ghost, .btn-green{border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--text-dim); font-size:13px; font-weight:600; padding:10px 16px; cursor:pointer; font-family:inherit;}
+.btn-green{background:var(--green); border-color:var(--green); color:#04140a;}
+.btn-danger{color:#f08a8a; border-color:#4a2222;}
+.saved-flash{font-size:12.5px; color:var(--green); margin-top:10px;}
+
+.ex-edit-form{padding:16px;}
+.ef-row{margin-bottom:10px;}
+.ef-row label{display:block; font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; font-weight:700;}
+.ef-row input{width:100%; background:var(--surface2); border:1px solid var(--line); color:var(--text); border-radius:10px; padding:10px; font-size:15px; font-family:inherit;}
+.ef-row input:focus{outline:none; border-color:var(--green);}
+.ef-split{display:flex; gap:10px;}
+.ef-split > div{flex:1;}
+
+.add-ex-btn{width:100%; background:transparent; border:1px dashed var(--line); color:var(--text-dim); border-radius:14px; padding:14px; cursor:pointer; font-size:14px; font-weight:600; margin-top:4px; font-family:inherit;}
+.add-ex-btn:hover{border-color:var(--green); color:var(--green);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <div class="brand-name">DISCI<span>PLINE</span></div>
+    <div class="brand-dot"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="daily">Daily</button>
+    <button class="tab-btn" data-tab="lifts">Lifts</button>
+  </div>
+
+  <div class="view active" id="view-daily">
+    <div class="hero" id="hero"></div>
+    <div id="day-grid-wrap"></div>
+    <div class="day-detail" id="day-detail"></div>
+  </div>
+
+  <div class="view" id="view-lifts">
+    <div class="day-picker" id="day-picker"></div>
+    <div id="session-panel"></div>
+  </div>
+
+</div>
+
+<script>
+/* ---------- Program schedule (fixed dates) ---------- */
+const SEGMENTS = [
+  {type:'cycle', cycle:1, start:'2026-10-12', days:37},  // Day 1 = Oct 12, Day 37 = Nov 17
+  {type:'rest',  start:'2026-11-18', days:6, label:'Rest, back on Nov 24'},
+  {type:'cycle', cycle:2, start:'2026-11-24', days:12}   // Nov 24 to Dec 5
+];
+
+const CHECK_ITEMS = [
+  {key:'noBreakfast', label:'No breakfast/good breakfast'},
+  {key:'lunch', label:'1 healthy lunch'},
+  {key:'dinner', label:'1 healthy dinner'},
+  {key:'workout1', label:'Workout 1'},
+  {key:'workout2', label:'Workout 2'},
+  {key:'water', label:'Full water'}
+];
+
+const QUOTES = [
+  ["The only bad workout is the one that didn't happen.", ""],
+  ["Discipline is choosing between what you want now and what you want most.", ""],
+  ["We are what we repeatedly do. Excellence, then, is not an act, but a habit.", "Will Durant"],
+  ["It does not matter how slowly you go as long as you do not stop.", "Confucius"],
+  ["The body achieves what the mind believes.", ""],
+  ["Success is the sum of small efforts, repeated day in and day out.", "Robert Collier"],
+  ["Strength does not come from winning. Your struggles develop your strengths.", "Arnold Schwarzenegger"],
+  ["The pain you feel today will be the strength you feel tomorrow.", ""],
+  ["You don't have to be great to start, but you have to start to be great.", "Zig Ziglar"],
+  ["Fall seven times, stand up eight.", "Japanese proverb"],
+  ["A year from now you will wish you had started today.", "Karen Lamb"],
+  ["Take care of your body. It's the only place you have to live.", "Jim Rohn"],
+  ["Whether you think you can, or you think you can't, you're probably right.", "Henry Ford"],
+  ["What you do every day matters more than what you do once in a while.", "Gretchen Rubin"],
+  ["Don't count the days. Make the days count.", "Muhammad Ali"],
+  ["Suffer now and live the rest of your life as a champion.", "Muhammad Ali"],
+  ["The harder the battle, the sweeter the victory.", ""],
+  ["No man has the right to be an amateur in the matter of physical training.", "Socrates"],
+  ["Your body can stand almost anything. It's your mind you have to convince.", ""],
+  ["Champions keep playing until they get it right.", "Billie Jean King"],
+  ["It's hard to beat a person who never gives up.", "Babe Ruth"],
+  ["Energy and persistence conquer all things.", "Benjamin Franklin"],
+  ["Don't wish for it. Work for it.", ""],
+  ["You miss 100% of the shots you don't take.", "Wayne Gretzky"],
+  ["The last three or four reps is what makes the muscle grow.", "Arnold Schwarzenegger"],
+  ["Fitness is not about being better than someone else. It's about being better than you used to be.", ""],
+  ["Do something today that your future self will thank you for.", ""],
+  ["The secret of getting ahead is getting started.", ""],
+  ["Hard work beats talent when talent doesn't work hard.", "Tim Notke"],
+  ["Rest if you must, but don't you quit.", ""],
+  ["Small daily improvements over time lead to stunning results.", "Robin Sharma"],
+  ["Be stronger than your excuses.", ""],
+  ["Perseverance is not a long race. It is many short races one after the other.", "Walter Elliot"],
+  ["Strive for progress, not perfection.", ""],
+  ["If it doesn't challenge you, it doesn't change you.", "Fred DeVito"],
+  ["The only way of discovering the limits of the possible is to venture a little way past them into the impossible.", "Arthur C. Clarke"],
+  ["You are one workout away from a good mood.", ""],
+  ["Show up. Do the work. Repeat.", ""],
+  ["Well done is better than well said.", "Benjamin Franklin"],
+  ["I fear not the man who has practiced 10,000 kicks once, but the man who has practiced one kick 10,000 times.", "Bruce Lee"],
+  ["Do not pray for an easy life, pray for the strength to endure a difficult one.", "Bruce Lee"],
+  ["The man who moves a mountain begins by carrying away small stones.", "Confucius"],
+  ["Nothing will work unless you do.", "Maya Angelou"],
+  ["Discipline equals freedom.", "Jocko Willink"],
+  ["Get comfortable being uncomfortable.", ""],
+  ["Your future is created by what you do today, not tomorrow.", ""],
+  ["The reward for work well done is the opportunity to do more.", "Jonas Salk"],
+  ["Little by little, a little becomes a lot.", "Tanzanian proverb"],
+  ["The best view comes after the hardest climb.", ""]
+];
+
+const DEFAULT_PLAN = {
+  push:{title:'Push', exercises:[
+    {id:'push-1', name:'Barbell bench press', sets:4, reps:'5–8'},
+    {id:'push-2', name:'Standing barbell overhead press', sets:4, reps:'6–8'},
+    {id:'push-3', name:'Incline dumbbell press', sets:3, reps:'8–10'},
+    {id:'push-4', name:'Dumbbell lateral raises', sets:4, reps:'12–15'},
+    {id:'push-5', name:'Dumbbell skull crushers', sets:3, reps:'10–12'},
+    {id:'push-6', name:'Dumbbell overhead tricep extension', sets:3, reps:'12–15'}
+  ]},
+  pull:{title:'Pull', exercises:[
+    {id:'pull-1', name:'Barbell bent over row', sets:4, reps:'6–8'},
+    {id:'pull-2', name:'One-arm dumbbell row', sets:4, reps:'8–10'},
+    {id:'pull-3', name:'Barbell Romanian deadlift', sets:3, reps:'8'},
+    {id:'pull-4', name:'Dumbbell rear delt fly', sets:4, reps:'12–15'},
+    {id:'pull-5', name:'Barbell curl', sets:3, reps:'8–10'},
+    {id:'pull-6', name:'Hammer curl', sets:3, reps:'10–12'}
+  ]},
+  legs:{title:'Legs', exercises:[
+    {id:'legs-1', name:'Barbell back squat', sets:4, reps:'6–8'},
+    {id:'legs-2', name:'Romanian deadlift', sets:4, reps:'8–10'},
+    {id:'legs-3', name:'Bulgarian split squat', sets:3, reps:'10 each leg'},
+    {id:'legs-4', name:'Dumbbell walking lunge', sets:3, reps:'12 each leg'},
+    {id:'legs-5', name:'Dumbbell calf raise', sets:5, reps:'15–20'},
+    {id:'legs-6', name:'Goblet squat burnout', sets:2, reps:'20'}
+  ]}
+};
+const LIFT_ORDER = ['push','pull','legs'];
+
+const ESB_SVG = '<svg viewBox="0 0 24 24" width="16" height="16" fill="#2b2610" aria-label="Empire State Building"><rect x="11.5" y="0.5" width="1" height="4.5"/><rect x="10.5" y="5" width="3" height="2.5"/><rect x="9" y="7.5" width="6" height="3"/><rect x="7.5" y="10.5" width="9" height="3.5"/><rect x="5.5" y="14" width="13" height="9"/></svg>';
+
+/* ---------- Helpers ---------- */
+function fmtDate(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function addDays(dateStr, n){
+  const p = dateStr.split('-').map(Number);
+  return fmtDate(new Date(p[0], p[1]-1, p[2]+n));
+}
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+const CELLS = [];
+const CELL_BY_DATE = {};
+let dayIndex = 0;
+SEGMENTS.forEach((seg, si)=>{
+  for(let i=0;i<seg.days;i++){
+    const date = addDays(seg.start, i);
+    const cell = {
+      date, seg:si, kind:seg.type, cycle:seg.cycle || 0,
+      n:i+1, total:seg.days, isLast:(i === seg.days-1),
+      qIndex: seg.type === 'cycle' ? dayIndex : -1
+    };
+    if(seg.type === 'cycle') dayIndex++;
+    CELLS.push(cell);
+    CELL_BY_DATE[date] = cell;
+  }
+});
+const LAST_CELL = CELLS[CELLS.length-1];
+
+function dayLabelForCell(cell){
+  if(!cell || cell.kind !== 'cycle') return '';
+  return cell.cycle === 1 ? 'Day ' + cell.n : 'Cycle 2, Day ' + cell.n;
+}
+function dayLabelForDate(dateStr){
+  const cell = CELL_BY_DATE[dateStr];
+  if(cell && cell.kind === 'cycle') return dayLabelForCell(cell);
+  const p = dateStr.split('-').map(Number);
+  return new Date(p[0], p[1]-1, p[2]).toLocaleDateString('en-AU',{day:'numeric', month:'short'});
+}
+function defaultSelectedDate(){
+  const today = fmtDate(new Date());
+  const dayCells = CELLS.filter(c=>c.kind==='cycle');
+  let pick = dayCells[0];
+  dayCells.forEach(c=>{ if(c.date <= today) pick = c; });
+  return pick.date;
+}
+
+/* ---------- State and storage ---------- */
+let state = { checklist:{}, logs:{}, plan:null };
+let selectedDate = defaultSelectedDate();
+let selectedLift = 'push';
+let openExerciseId = null;
+let editingExId = null;
+let flashExId = null;
+
+function lsGet(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
+function lsSet(key, value){ try{ localStorage.setItem(key, value); }catch(e){} }
+
+function loadData(){
+  const c = lsGet('disc3-checklist');
+  if(c){ try{ state.checklist = JSON.parse(c); }catch(e){} }
+  const l = lsGet('disc3-logs');
+  if(l){ try{ state.logs = JSON.parse(l); }catch(e){} }
+  const p = lsGet('disc3-plan');
+  if(p){ try{ state.plan = JSON.parse(p); }catch(e){} }
+  if(!state.plan || !state.plan.push || !state.plan.pull || !state.plan.legs){
+    state.plan = JSON.parse(JSON.stringify(DEFAULT_PLAN));
+    savePlan();
+  }
+}
+function saveChecklist(){ lsSet('disc3-checklist', JSON.stringify(state.checklist)); }
+function saveLogs(){ lsSet('disc3-logs', JSON.stringify(state.logs)); }
+function savePlan(){ lsSet('disc3-plan', JSON.stringify(state.plan)); }
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ---------- Daily tab ---------- */
+function completedCount(dateStr){
+  const c = state.checklist[dateStr];
+  if(!c) return 0;
+  return CHECK_ITEMS.reduce((n,item)=> n + (c[item.key] ? 1 : 0), 0);
+}
+
+function renderHero(){
+  const cell = CELL_BY_DATE[selectedDate];
+  const q = QUOTES[cell.qIndex % QUOTES.length];
+  const done = completedCount(selectedDate);
+  document.getElementById('hero').innerHTML = `
+    <div class="hero-top">
+      <div class="hero-day">${esc(dayLabelForCell(cell).toUpperCase())}</div>
+      <div class="hero-count">${done} of ${CHECK_ITEMS.length} done</div>
+    </div>
+    <div class="hero-quote">&ldquo;${esc(q[0])}&rdquo;</div>
+    ${q[1] ? '<div class="hero-by">' + esc(q[1]) + '</div>' : ''}
+  `;
+}
+
+function renderDayGrid(){
+  const wrap = document.getElementById('day-grid-wrap');
+  wrap.innerHTML = '';
+  const todayStr = fmtDate(new Date());
+
+  SEGMENTS.forEach((seg, si)=>{
+    const label = document.createElement('div');
+    label.className = 'section-label' + (seg.type==='rest' ? ' rest-label' : '');
+    label.textContent = seg.type === 'cycle'
+      ? 'Cycle ' + seg.cycle + ', Day 1 to ' + seg.days
+      : seg.label;
+    wrap.appendChild(label);
+
+    const grid = document.createElement('div');
+    grid.className = 'day-grid';
+
+    CELLS.filter(c=>c.seg===si).forEach(cell=>{
+      const el = document.createElement('div');
+
+      if(cell.kind === 'rest'){
+        el.className = 'day-cell rest';
+        el.innerHTML = '<div class="day-num">·</div>';
+        grid.appendChild(el);
+        return;
+      }
+
+      const c = completedCount(cell.date);
+      const full = c === CHECK_ITEMS.length;
+      let badge = '';
+      if(cell === LAST_CELL) badge = '<div class="badge esb">' + ESB_SVG + '</div>';
+      else if(cell.isLast) badge = '<div class="badge">&#127866;</div>';
+
+      el.className = 'day-cell'
+        + (cell.date===todayStr ? ' current' : '')
+        + (cell.date===selectedDate ? ' selected' : '')
+        + (full ? ' complete' : (c>0 ? ' partial' : ''))
+        + (cell.isLast ? ' finish' : '');
+      el.innerHTML = `<div class="day-num">${cell.n}</div>${badge}`;
+      el.addEventListener('click', ()=>{
+        selectedDate = cell.date;
+        renderHero();
+        renderDayGrid();
+        renderDayDetail();
+      });
+      grid.appendChild(el);
+    });
+
+    wrap.appendChild(grid);
+  });
+}
+
+function renderDayDetail(){
+  const panel = document.getElementById('day-detail');
+  if(!state.checklist[selectedDate]) state.checklist[selectedDate] = {};
+  const c = state.checklist[selectedDate];
+
+  const weightRow = `<div class="weight-row">
+      <label>Morning weight</label>
+      <div class="weight-input-wrap">
+        <input type="number" inputmode="decimal" step="0.1" id="weight-input" value="${c.weight !== undefined ? esc(c.weight) : ''}" placeholder="--">
+        <span>kg</span>
+      </div>
+    </div>`;
+
+  panel.innerHTML = weightRow + CHECK_ITEMS.map(item=>`
+    <div class="check-row${c[item.key]?' checked':''}" data-key="${item.key}">
+      <div class="check-box">${c[item.key]?'&#10003;':''}</div>
+      <div class="check-label">${item.label}</div>
+    </div>
+  `).join('');
+
+  panel.querySelectorAll('.check-row').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const key = row.dataset.key;
+      c[key] = !c[key];
+      saveChecklist();
+      renderHero();
+      renderDayDetail();
+      renderDayGrid();
+    });
+  });
+
+  const weightInput = panel.querySelector('#weight-input');
+  weightInput.addEventListener('change', ()=>{
+    const v = weightInput.value.trim();
+    if(v === ''){ delete c.weight; }
+    else{ c.weight = Number(v); }
+    saveChecklist();
+  });
+}
+
+/* ---------- Lifts tab ---------- */
+function renderDayPicker(){
+  const el = document.getElementById('day-picker');
+  el.innerHTML = LIFT_ORDER.map(key=>`
+    <button class="day-pick-btn${key===selectedLift?' active':''}" data-lift="${key}">${esc(state.plan[key].title)}</button>
+  `).join('');
+  el.querySelectorAll('.day-pick-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      selectedLift = btn.dataset.lift;
+      openExerciseId = null;
+      editingExId = null;
+      flashExId = null;
+      renderDayPicker();
+      renderSession();
+    });
+  });
+}
+
+function entriesFor(exId){
+  return (state.logs[exId] || []).slice().sort((a,b)=> a.date < b.date ? 1 : -1);
+}
+function summarizeSets(sets){
+  return sets.map(s=> `${s.weight}kg×${s.reps}`).join(', ');
+}
+
+function renderSession(){
+  const plan = state.plan[selectedLift];
+  const panel = document.getElementById('session-panel');
+  const todayStr = fmtDate(new Date());
+
+  const head = `<div class="session-head"><div class="title">${esc(plan.title)}</div></div>`;
+
+  const cards = plan.exercises.map(ex=>{
+    const exId = ex.id;
+    const history = entriesFor(exId);
+    const previous = history.find(e=> e.date < todayStr);
+    const todayEntry = history.find(e=> e.date === todayStr);
+    const lastLabel = previous
+      ? 'Last (' + dayLabelForDate(previous.date) + '): ' + summarizeSets(previous.sets)
+      : 'No history yet';
+    const isOpen = openExerciseId === exId;
+    const isEditing = editingExId === exId;
+
+    if(isEditing){
+      return `<div class="ex-card open" data-exid="${esc(exId)}">
+        <div class="ex-edit-form">
+          <div class="ef-row">
+            <label>Exercise name</label>
+            <input class="ef-name" value="${esc(ex.name)}">
+          </div>
+          <div class="ef-split">
+            <div class="ef-row">
+              <label>Sets</label>
+              <input class="ef-sets" type="number" min="1" value="${esc(ex.sets)}">
+            </div>
+            <div class="ef-row">
+              <label>Reps</label>
+              <input class="ef-reps" value="${esc(ex.reps)}">
+            </div>
+          </div>
+          <div class="ex-actions">
+            <button class="btn-green" data-action="save-edit">Save</button>
+            <button class="btn-ghost" data-action="cancel-edit">Cancel</button>
+            <button class="btn-ghost btn-danger" data-action="delete-ex">Delete</button>
+          </div>
+        </div>
+      </div>`;
+    }
+
+    const inputRows = Array.from({length:ex.sets}).map((_,i)=>{
+      const s = todayEntry && todayEntry.sets[i];
+      return `<div class="set-row">
+        <div class="set-num">${i+1}</div>
+        <input type="number" inputmode="decimal" placeholder="kg" data-role="weight" value="${s ? esc(s.weight) : ''}">
+        <input type="number" inputmode="numeric" placeholder="reps" data-role="reps" value="${s ? esc(s.reps) : ''}">
+      </div>`;
+    }).join('');
+
+    return `<div class="ex-card${isOpen?' open':''}" data-exid="${esc(exId)}">
+      <div class="ex-head">
+        <div>
+          <div class="ex-name">${esc(ex.name)}</div>
+          <div class="ex-target">${esc(ex.sets)} sets × ${esc(ex.reps)}</div>
+          <div class="ex-last">${esc(lastLabel)}</div>
+        </div>
+        <div class="ex-head-right">
+          <button class="icon-btn" data-action="edit-ex" aria-label="Edit exercise">&#9998;</button>
+          <div class="ex-chevron">&#9662;</div>
+        </div>
+      </div>
+      <div class="ex-body">
+        ${inputRows}
+        <div class="ex-actions">
+          <button class="btn-green" data-action="save">Save today's sets</button>
+        </div>
+        ${flashExId===exId ? '<div class="saved-flash">Saved</div>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML = head + cards + '<button class="add-ex-btn" id="add-ex-btn">+ Add exercise</button>';
+
+  panel.querySelectorAll('.ex-card').forEach(card=>{
+    const exId = card.dataset.exid;
+
+    if(card.querySelector('.ex-edit-form')){
+      card.querySelector('[data-action="save-edit"]').addEventListener('click', ()=>{
+        const nameVal = card.querySelector('.ef-name').value.trim();
+        const setsVal = Math.max(1, Number(card.querySelector('.ef-sets').value) || 1);
+        const repsVal = card.querySelector('.ef-reps').value.trim();
+        if(!nameVal) return;
+        const arr = state.plan[selectedLift].exercises;
+        const idx = arr.findIndex(e=>e.id===exId);
+        if(idx > -1){
+          arr[idx].name = nameVal;
+          arr[idx].sets = setsVal;
+          arr[idx].reps = repsVal;
+        }
+        editingExId = null;
+        savePlan();
+        renderSession();
+      });
+      card.querySelector('[data-action="cancel-edit"]').addEventListener('click', ()=>{
+        const arr = state.plan[selectedLift].exercises;
+        const found = arr.find(e=>e.id===exId);
+        if(found && found.name === 'New exercise' && found.reps === ''){
+          state.plan[selectedLift].exercises = arr.filter(e=>e.id!==exId);
+          savePlan();
+        }
+        editingExId = null;
+        renderSession();
+      });
+      card.querySelector('[data-action="delete-ex"]').addEventListener('click', ()=>{
+        state.plan[selectedLift].exercises = state.plan[selectedLift].exercises.filter(e=>e.id!==exId);
+        editingExId = null;
+        savePlan();
+        renderSession();
+      });
+      return;
+    }
+
+    card.querySelector('.ex-head').addEventListener('click', (e)=>{
+      if(e.target.closest('[data-action="edit-ex"]')) return;
+      openExerciseId = (openExerciseId === exId) ? null : exId;
+      flashExId = null;
+      renderSession();
+    });
+    card.querySelector('[data-action="edit-ex"]').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      editingExId = exId;
+      openExerciseId = null;
+      renderSession();
+    });
+    card.querySelector('[data-action="save"]').addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const weightInputs = card.querySelectorAll('input[data-role="weight"]');
+      const repInputs = card.querySelectorAll('input[data-role="reps"]');
+      const sets = [];
+      weightInputs.forEach((wi,i)=>{
+        const w = wi.value.trim();
+        const r = repInputs[i].value.trim();
+        if(w !== '' && r !== ''){
+          sets.push({weight:Number(w), reps:Number(r)});
+        }
+      });
+      if(sets.length === 0) return;
+      if(!state.logs[exId]) state.logs[exId] = [];
+      state.logs[exId] = state.logs[exId].filter(entry=> entry.date !== todayStr);
+      state.logs[exId].push({date:todayStr, sets});
+      saveLogs();
+      openExerciseId = exId;
+      flashExId = exId;
+      renderSession();
+    });
+  });
+
+  document.getElementById('add-ex-btn').addEventListener('click', ()=>{
+    const newId = selectedLift + '-' + Date.now();
+    state.plan[selectedLift].exercises.push({id:newId, name:'New exercise', sets:3, reps:''});
+    editingExId = newId;
+    openExerciseId = null;
+    savePlan();
+    renderSession();
+  });
+}
+
+/* ---------- Init ---------- */
+loadData();
+renderHero();
+renderDayGrid();
+renderDayDetail();
+renderDayPicker();
+renderSession();
+</script>
+</body>
+</html>
